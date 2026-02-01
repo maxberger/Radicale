@@ -90,6 +90,11 @@
                 <img src="css/icons/edit.svg" class="icon" alt="✏️">
               </a>
             </li>
+            <li class="hidden" data-name="shareoption">
+              <a href="" title="Share" class="blue" data-name="share">
+                <img src="css/icons/share.svg" class="icon" alt="🔗">
+              </a>
+            </li>
             <li>
               <a href="" title="Delete" class="red" data-name="delete">
                 <img src="css/icons/delete.svg" class="icon" alt="❌">
@@ -131,6 +136,35 @@
         </form>
         <span class="error hidden" data-name="error"></span>
         <br>
+      </section>
+
+      <section id="sharecollectionscene" class="container hidden">
+        <h1>Collection Sharing</h1>
+        <p>Manage sharing for collection <span class="title" data-name="title">title</span>
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Path/Token</th>
+              <th>Mapped</th>
+              <th>User</th>
+              <th>Permissions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-name="sharerowtemplate" class="hidden">
+              <td data-name="type"></td>
+              <td data-name="pathortoken"></td>
+              <td data-name="pathmapped"></td>
+              <td data-name="user"></td>
+              <td data-name="permissions"></td>
+            </tr>
+          </tbody>
+        </table>
+        <form>
+          <button type="button" class="blue" data-name="cancel">Close</button>
+        </form>
       </section>
 
       <section id="createcollectionscene" class="container hidden">

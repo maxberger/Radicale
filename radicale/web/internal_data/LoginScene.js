@@ -20,7 +20,7 @@
 
 import { Scene, push_scene, pop_scene, scene_stack } from "./scene_manager.js";
 import { LoadingScene } from "./LoadingScene.js";
-import { get_principal } from "./api.js";
+import { get_principal, discover_server_features } from "./api.js";
 import { CollectionsScene } from "./CollectionsScene.js";
 
 /**
@@ -89,6 +89,7 @@ export function LoginScene() {
                                 error = error1;
                                 user = saved_user;
                             });
+                        discover_server_features(saved_user, password);
                         push_scene(collections_scene, true);
                     }
                 });

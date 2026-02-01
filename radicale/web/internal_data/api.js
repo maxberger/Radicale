@@ -22,6 +22,8 @@ import { Collection, CollectionType } from "./models.js";
 import { SERVER, ROOT_PATH, COLOR_RE } from "./constants.js";
 import { escape_xml } from "./utils.js";
 
+export let server_features = {};
+
 /**
  * Find the principal collection.
  * @param {string} user
@@ -339,4 +341,40 @@ export function create_collection(user, password, collection, callback) {
  */
 export function edit_collection(user, password, collection, callback) {
     return create_edit_collection(user, password, collection, false, callback);
+}
+
+
+export function discover_server_features(user, password) {
+    let request = new XMLHttpRequest();
+    request.open("POST", SERVER + ROOT_PATH + ".sharing/v1/all/info", true, user, encodeURIComponent(password));
+    request.onreadystatechange = function() {
+        if (request.readyState !== 4) {
+            return;
+        }
+        if (request.status === 200) {
+            server_features["sharing"] = JSON.parse(request.responseText);
+            maybe_enable_sharing_options();
+        } else if (request.status === 404) {
+            // sharing is disabled on the server
+            server_features["sharing"] = {};
+        } else {
+            console.error("Failed to discover sharing features: " + request.status + " " + request.statusText);
+        }
+    }
+    request.setRequestHeader("Accept", "application/json");
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.send(JSON.stringify({}));
+}
+
+function maybe_enable_sharing_options() {
+    if (!server_features["sharing"]) return;
+    let map_is_enabled = server_features["sharing"]["FeatureEnabledCollectionByMap"] || false;
+    let token_is_enabled = server_features["sharing"]["FeatureEnabledCollectionByToken"] || false;
+    if (map_is_enabled || token_is_enabled) {
+        let share_options = document.querySelectorAll("[data-name=shareoption]");
+        for (let i = 0; i < share_options.length; i++) {
+            let share_option = share_options[i];
+            share_option.classList.remove("hidden");
+        }
+    }
 }
