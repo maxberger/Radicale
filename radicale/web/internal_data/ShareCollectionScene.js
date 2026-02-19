@@ -18,8 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+    add_share_by_token,
+    reload_sharing_list,
+    server_features,
+} from "./api.js";
 import { pop_scene, scene_stack } from "./scene_manager.js";
-import { SERVER, ROOT_PATH } from "./constants.js";
 
 /**
  * @constructor
@@ -35,8 +39,10 @@ export function CreateShareCollectionScene(user, password, collection) {
 
   // TODO: Other elements
 
-//   let submit_btn = html_scene.querySelector("[data-name=submit]");
+  //   let submit_btn = html_scene.querySelector("[data-name=submit]");
   let cancel_btn = html_scene.querySelector("[data-name=cancel]");
+  let share_by_map_btn = html_scene.querySelector("[data-name=sharebymap]");
+  let share_by_token_btn = html_scene.querySelector("[data-name=sharebytoken]");
 
   let title = html_scene.querySelector("[data-name=title]");
 
@@ -54,12 +60,21 @@ export function CreateShareCollectionScene(user, password, collection) {
     }
     return false;
   }
+
+  function onsharebytoken() {
+    add_share_by_token(user, password, collection, function () {
+      update_share_list(user, password, collection);
+    });
+  }
+
   this.show = function () {
     this.release();
     scene_index = scene_stack.length - 1;
     html_scene.classList.remove("hidden");
     // submit_btn.onclick = onsubmit;
     cancel_btn.onclick = oncancel;
+    // share_by_map_btn.onclick = ;
+    share_by_token_btn.onclick = onsharebytoken;
     title.textContent = collection.displayname || collection.href;
     update_share_list(user, password, collection);
   };
@@ -84,39 +99,10 @@ function update_share_list(user, password, collection) {
 
   console.info(collection);
 
-  let request = new XMLHttpRequest();
-  request.open(
-    "POST",
-    SERVER + ROOT_PATH + ".sharing/v1/all/list",
-    true,
-    user,
-    encodeURIComponent(password),
-  );
-  request.onreadystatechange = function () {
-    if (request.readyState !== 4) {
-      return;
-    }
-    if (request.status === 200) {
-      let response = JSON.parse(request.responseText);
-      add_share_rows(collection, response["Content"] || []);
-      console.info(response);
-    } else {
-      console.error(
-        "Failed to load sharing list: " +
-          request.status +
-          " " +
-          request.statusText,
-      );
-    }
-  };
-  request.setRequestHeader("Accept", "application/json");
-  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  let collection_without_trailing_slash = collection.href.replace(/\/?$/, ""); // delete trailing slash
-  // TODO: 
-//   request.send(
-//     JSON.stringify({ PathMapped: collection_without_trailing_slash }),
-//   );
-  request.send(JSON.stringify({}));
+  reload_sharing_list(user, password, collection, function (response) {
+    console.info("Sharing list loaded", response);
+    add_share_rows(collection, response["Content"] || []);
+  });
 }
 
 function add_share_rows(collection, shares) {
@@ -132,12 +118,27 @@ function add_share_rows(collection, shares) {
       node.classList.remove("hidden");
       node.querySelector("[data-name=type]").textContent =
         share["ShareType"] || "";
-      node.querySelector("[data-name=pathortoken]").textContent = pathortoken;
-      node.querySelector("[data-name=pathmapped]").textContent = pathmapped;
+      node.querySelector("[data-name=pathortoken]").value = pathortoken;
+      node.querySelector("[data-name=pathmapped]").value = pathmapped;
       node.querySelector("[data-name=user]").textContent = share["User"] || "";
       node.querySelector("[data-name=permissions]").textContent =
         share["Permissions"] || "";
       template.parentNode.insertBefore(node, template);
     }
   });
+}
+
+export function maybe_enable_sharing_options() {
+  if (!server_features["sharing"]) return;
+  let map_is_enabled =
+    server_features["sharing"]["FeatureEnabledCollectionByMap"] || false;
+  let token_is_enabled =
+    server_features["sharing"]["FeatureEnabledCollectionByToken"] || false;
+  if (map_is_enabled || token_is_enabled) {
+    let share_options = document.querySelectorAll("[data-name=shareoption]");
+    for (let i = 0; i < share_options.length; i++) {
+      let share_option = share_options[i];
+      share_option.classList.remove("hidden");
+    }
+  }
 }

@@ -303,6 +303,13 @@ main{
     filter: invert(1);
 }
 
+.small_icon{
+    width: 35%;
+    height: 35%;
+    filter: invert(1);
+}
+
+
 .smalltext{
     font-size: 75% !important;
 }

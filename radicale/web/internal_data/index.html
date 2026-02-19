@@ -155,8 +155,12 @@
           <tbody>
             <tr data-name="sharerowtemplate" class="hidden">
               <td data-name="type"></td>
-              <td data-name="pathortoken"></td>
-              <td data-name="pathmapped"></td>
+              <td>
+                <input type="text" data-name="pathortoken" value="" readonly="" onfocus="this.setSelectionRange(0, 99999);">
+              </td>
+              <td>
+                <input type="text" data-name="pathmapped" value="" readonly="" onfocus="this.setSelectionRange(0, 99999);">
+              </td>
               <td data-name="user"></td>
               <td data-name="permissions"></td>
             </tr>
@@ -164,6 +168,8 @@
         </table>
         <form>
           <button type="button" class="blue" data-name="cancel">Close</button>
+          <button type="button" class="green" data-name="sharebymap"><img src="css/icons/share.svg" class="small_icon" alt="Share"><img src="css/icons/repeat.svg" class="small_icon" alt="map"></button>
+          <button type="button" class="green" data-name="sharebytoken"><img src="css/icons/share.svg" class="small_icon" alt="Share"><img src="css/icons/key.svg" class="small_icon" alt="token"></button>
         </form>
       </section>
 
