@@ -34,9 +34,11 @@ class TestBaseWebRequests(BaseTest):
         self.post("/.web", check=405)
         _, answer = self.get("/.web/js/config.js")
         assert "export const PREFER_BROWSER_LOGIN = false;" in answer
-        self.configure({"web": {"prefer_browser_login": "True"}})
+        assert "export const MOBILECONFIG = false;" in answer
+        self.configure({"web": {"prefer_browser_login": "True", "mobileconfig": "True"}})
         _, answer = self.get("/.web/js/config.js")
         assert "export const PREFER_BROWSER_LOGIN = true;" in answer
+        assert "export const MOBILECONFIG = true;" in answer
 
     def test_none(self) -> None:
         self.configure({"web": {"type": "none"}})

@@ -1760,6 +1760,14 @@ headers are configured correctly.s
 
 Default: `False`
 
+##### mobileconfig
+
+_(&gt;= 3.8.0)_
+
+Display mobileconfig button in the web UI.
+
+Default: `False`
+
 #### [logging]
 
 ##### level

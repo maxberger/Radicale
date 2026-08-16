@@ -27,6 +27,8 @@ import { collectionsCache } from "../utils/collections_cache.js";
 import { ErrorHandler } from "../utils/error.js";
 import { bytesToHumanReadable, get_element, get_element_by_id } from "../utils/misc.js";
 import { UrlTextHandler } from "../utils/url_text.js";
+import { MOBILECONFIG } from "../config.js";
+import { download_mobileconfig } from "../extra/MobileConfig.js";
 import { CreateEditCollectionScene } from "./CreateEditCollectionScene.js";
 import { DeleteConfirmationScene } from "./DeleteConfirmationScene.js";
 import { IncomingSharingScene } from "./IncomingSharingScene.js";
@@ -56,9 +58,11 @@ export class CollectionsScene {
         this._new_btn = get_element(this._html_scene, "[data-name=new]");
         this._upload_btn = get_element(this._html_scene, "[data-name=upload]");
         this._incomingshares_btn = get_element(this._html_scene, "[data-name=incomingshares]");
+        this._mobileconfig_btn = get_element(this._html_scene, "[data-name=mobileconfig]");
         this._error_div = get_element(this._html_scene, "[data-name=collectionsscene_error]");
 
         /** @type {Array<HTMLElement>} */ this._nodes = [];
+        /** @type {Collection[]} */ this._collections = [];
         this._errorHandler = new ErrorHandler(this._error_div);
     }
 
@@ -86,6 +90,21 @@ export class CollectionsScene {
         try {
             let incoming_sharing_scene = new IncomingSharingScene(this._user, this._password);
             push_scene(incoming_sharing_scene);
+        } catch (err) {
+            console.error(err);
+        }
+        return false;
+    }
+
+    /**
+     * @param {Event} [event]
+     */
+    async _onmobileconfig(event) {
+        if (event) {
+            event.preventDefault();
+        }
+        try {
+            await download_mobileconfig(this._user, this._principal_collection, this._collections);
         } catch (err) {
             console.error(err);
         }
@@ -324,6 +343,7 @@ export class CollectionsScene {
 
         this._sort_collections(collections, shares);
         this._clear_collections_display();
+        this._collections = collections;
 
         collections.forEach((collection) => {
             this._render_collection(collection, shares);
@@ -340,6 +360,16 @@ export class CollectionsScene {
         this._new_btn.onclick = () => this._onnew();
         this._upload_btn.onclick = () => this._onupload();
         this._incomingshares_btn.onclick = () => this._onincomingshares();
+        if (MOBILECONFIG) {
+            this._mobileconfig_btn.classList.remove("hidden");
+        } else {
+            this._mobileconfig_btn.classList.add("hidden");
+        }
+        this._mobileconfig_btn.onclick = (event) => {
+            if (event) event.preventDefault();
+            this._onmobileconfig(event);
+            return false;
+        };
         collectionsCache.getChildCollections(this._user, this._password, this._principal_collection, (e) => this._errorwrapper(e), (c, s, ce) => this._show_collections(c, s, ce));
         collectionsCache.getServerFeatures(this._user, this._password, (e) => this._errorwrapper(e), maybe_enable_sharing_options);
     }
@@ -349,6 +379,9 @@ export class CollectionsScene {
         this._new_btn.onclick = null;
         this._upload_btn.onclick = null;
         this._incomingshares_btn.onclick = null;
+        if (this._mobileconfig_btn) {
+            this._mobileconfig_btn.onclick = null;
+        }
         this._clear_collections_display();
     }
 

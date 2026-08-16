@@ -47,6 +47,7 @@ class Config:
     auth_type: AuthType
     sharing_type: SharingType
     extra_config: str = ""
+    web_extra: str = ""
     admin_username: str = "admin"
     user_username: str = "max"
 
@@ -134,8 +135,9 @@ type = {config.auth_type.value}
             f.write("htpasswd_encryption = plain\n")
 
         f.write(
-            """[web]
+            f"""[web]
 type = internal
+{config.web_extra}
 [headers]
 Content-Security-Policy = default-src 'self'; object-src 'none'
 """

@@ -406,6 +406,9 @@ type = none
 # Prefer browser login
 #prefer_browser_login = False
 
+# Enable mobileconfig in web UI
+#mobileconfig = False
+
 
 [logging]
 

@@ -48,11 +48,15 @@ class Web(web.BaseWeb):
                 if self.configuration.get("web", "prefer_browser_login")
                 else "false"
             )
-            content = (
-                f"export const PREFER_BROWSER_LOGIN = {prefer_browser_login};\n".encode(
-                    "utf-8"
-                )
+            mobileconfig = (
+                "true"
+                if self.configuration.get("web", "mobileconfig")
+                else "false"
             )
+            content = (
+                f"export const PREFER_BROWSER_LOGIN = {prefer_browser_login};\n"
+                f"export const MOBILECONFIG = {mobileconfig};\n"
+            ).encode("utf-8")
             headers = {"Content-Type": "application/javascript"}
             return 200, headers, content, None
         return httputils.serve_resource(

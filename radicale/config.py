@@ -747,6 +747,10 @@ This is an automated message. Please do not reply.""",
         ("prefer_browser_login", {
             "value": "False",
             "help": "prefer browser login",
+            "type": bool}),
+        ("mobileconfig", {
+            "value": "False",
+            "help": "enable mobileconfig in web UI",
             "type": bool})])),
     ("logging", OrderedDict([
         ("level", {
